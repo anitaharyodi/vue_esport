@@ -5,6 +5,7 @@
             <v-form ref="form" v-model="valid">
                 <v-container class="formRegister">
                     <v-text-field v-model="formInput.name" label="Nama Lengkap" color="purple" solo required></v-text-field>
+                    
                     <v-text-field v-model="formInput.nickname" label="Nickname" color="purple" solo required></v-text-field>
                     <v-text-field v-model="formInput.nohp" label="No Handphone" color="purple" type="tel" solo required></v-text-field>
                     <v-text-field v-model="formInput.email" label="Email" color="purple" solo required></v-text-field>
@@ -59,6 +60,8 @@ export default {
         }
     },
     setup() {
+        //state validation
+        const validation = ref([])
         const divisis = ref([])
 
         onMounted(() => {
@@ -72,6 +75,7 @@ export default {
 
         return {
             // 
+            validation,
             divisis,
         }
     },
@@ -79,7 +83,8 @@ export default {
     methods:{
         register() {
             console.log(this.formInput);
-            axios.post(route + 'register', {name: this.formInput.name, 
+            axios.post(route + 'register', {
+                name: this.formInput.name, 
                 nickname: this.formInput.nickname, 
                 nohp: this.formInput.nohp, 
                 email:this.formInput.email, 
@@ -98,10 +103,11 @@ export default {
                 toastr.success('Register Success');
                 // this.switchPage(response.data.user.idRole);                
             }).catch(error => {
-                console.log(error);            
+                console.log(error);        
+                toastr.error('Register Failed');
             });
         }
-  },
+    },
 }
 </script>
 

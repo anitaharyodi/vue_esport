@@ -49,6 +49,12 @@ const router = new VueRouter({
             
         },
         {
+            path: "/jadwalPage",
+            name: "Jadwal",
+            component: importComponent("views/JadwalPage"),
+            
+        },
+        {
             path: "/editPage",
             name: "EditPage",
             component: importComponent("views/EditProfilePage"),

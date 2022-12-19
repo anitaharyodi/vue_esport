@@ -111,6 +111,12 @@ export default {
             icon: 'bx-user',
           },
           {
+            link: '/jadwalPage',
+            name: 'Jadwal',
+            tooltip: 'Jadwal',
+            icon: 'bx bx-table',
+          },
+          {
             link: '/teamPage',
             name: 'Team',
             tooltip: 'Team',

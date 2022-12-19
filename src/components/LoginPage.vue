@@ -78,7 +78,8 @@ export default {
         toastr.success('Login Success');
         this.switchPage(response.data.user.role && response.data.user.role.id);                
       }).catch(error => {
-        console.log(error);            
+        console.log(error);
+        toastr.error('Login Failed');
       });
     },
     // switchPage(role){
