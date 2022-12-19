@@ -4,29 +4,29 @@
             <h1 class="titleText">REGISTER</h1>
             <v-form ref="form" v-model="valid">
                 <v-container class="formRegister">
-                    <v-text-field v-model="formInput.name" label="Nama Lengkap" color="purple" solo required></v-text-field>
-                    
-                    <v-text-field v-model="formInput.nickname" label="Nickname" color="purple" solo required></v-text-field>
-                    <v-text-field v-model="formInput.nohp" label="No Handphone" color="purple" type="tel" solo required></v-text-field>
-                    <v-text-field v-model="formInput.email" label="Email" color="purple" solo required></v-text-field>
-                    <v-text-field v-model="formInput.password" type="password" label="Password" color="purple" solo required></v-text-field>
-
-                    <v-select v-model="formInput.divisi" 
-                            :items="divisis" item-text="nama"
-                            item-value="kode_divisi"
-                            return-object
-                            label="Divisi" 
-                            color="purple" 
-                            solo required>
-                    </v-select>
-                    <v-file-input v-model="formInput.pasphoto" accept="image/*" color="grey" counter label="Masukkan Foto Profil" placeholder="Masukkan Foto Profil" prepend-icon="mdi-paperclip" solo :show-size="1000">
+                    <v-text-field v-model="formInput.name" prepend-inner-icon="bx bx-user" :rules="[rules.required]" label="Nama Lengkap" color="purple" solo required></v-text-field>
+                    <v-text-field v-model="formInput.nickname" prepend-inner-icon="bx bx-user-pin" :rules="[rules.required]" label="Nickname" color="purple" solo required></v-text-field>
+                    <v-text-field v-model="formInput.nohp" prepend-inner-icon="bx bx-phone" :rules="[rules.required, rules.nohp]" label="No Handphone" color="purple" type="tel" solo required></v-text-field>
+                    <v-text-field v-model="formInput.email" prepend-inner-icon="bx bx-envelope" label="Email" color="purple" :rules="[rules.required, rules.email]" solo required></v-text-field>
+                    <v-text-field v-model="formInput.password" prepend-inner-icon="bx bx-lock" type="password" label="Password" color="purple" :rules="[rules.required, rules.password]" solo required></v-text-field>
+                    <v-autocomplete v-model="formInput.divisi" 
+                        :items="divisis" item-text="nama"
+                        item-value="kode_divisi"
+                        return-object
+                        label="Divisi" 
+                        color="purple"
+                        prepend-inner-icon="bx bx-selection"
+                        :rules="[rules.required]" 
+                        solo required>
+                    </v-autocomplete>
+                    <v-file-input v-model="formInput.pasphoto" :rules="[rules.required]" accept="image/*" color="grey" counter label="Masukkan Foto Profil" placeholder="Masukkan Foto Profil" solo :show-size="1000">
                         <template v-slot:selection="{ index, text }">
                             <v-chip v-if="index < 2" color="grey lighten-3" label>
                                 {{ text }}
-                             </v-chip>
+                            </v-chip>
                             <span v-else-if="index === 2" class="text-overline grey--text text--darken-3 mx-2"> +{{ pasphoto.length - 2 }} File(s)</span>
                         </template>
-                    </v-file-input>
+                    </v-file-input>     
                     <v-spacer></v-spacer>
                     <v-btn class="btnRegister" @click="register" color="red darken-3" style="color: white;">Register</v-btn>
                 </v-container>
@@ -47,6 +47,7 @@ const route = "https://store.ksaduajy.com/laravel_esport/api/";
 export default {
     data() {
         return {
+            formHasErrors: false,
             formInput: {
                 name: null,
                 nickname: null,
@@ -56,12 +57,24 @@ export default {
                 divisi: null,
                 pasphoto : null,
             }, 
-            
+            rules: {
+                required: value => !!value || 'Required!',
+                email: value => {
+                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                    return pattern.test(value) || 'Invalid Email!'
+                },
+                password: value => {
+                    const pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+                    return pattern.test(value) || 'Minimum Eight Characters, At Least One Letter, One Number And One Special Character!'
+                },
+                nohp: value => {
+                    const pattern = /^08[0-9]{10,11}$/
+                    return pattern.test(value) || 'Invalid No Handphone (12-13 Digits)!'
+                },
+            },        
         }
     },
     setup() {
-        //state validation
-        const validation = ref([])
         const divisis = ref([])
 
         onMounted(() => {
@@ -69,20 +82,32 @@ export default {
             .then(response => {
                 divisis.value = response.data.data;
             }).catch(error => {
-            console.log(error);            
+                console.log(error);            
             })
         })
 
         return {
-            // 
-            validation,
             divisis,
         }
     },
-
+    computed: {
+      form () {
+        return {
+          name: this.name,
+        }
+      },
+    },
     methods:{
         register() {
-            console.log(this.formInput);
+            if (this.$refs.form.validate()) {
+                this.formHasErrors = false
+                this.registerProcess();
+            } else {
+                this.formHasErrors = true
+            }
+        },
+        registerProcess() {
+           console.log(this.formInput);
             axios.post(route + 'register', {
                 name: this.formInput.name, 
                 nickname: this.formInput.nickname, 
@@ -103,10 +128,16 @@ export default {
                 toastr.success('Register Success');
                 // this.switchPage(response.data.user.idRole);                
             }).catch(error => {
-                console.log(error);        
-                toastr.error('Register Failed');
+                console.log(error);  
+                if(error.response.status == 422) {
+                    toastr.error('Email Already Exist!');
+                } else if(error.response.status == 500) {
+                    toastr.error('Server Error!');
+                } else {
+                    toastr.error('Register Failed!');
+                }
             });
-        }
+        },
     },
 }
 </script>

@@ -8,11 +8,15 @@
                 v-model="formInput.email"
                 label="Email"
                 color="purple"
+                :rules="[rules.required, rules.email]"
+                prepend-inner-icon="bx bx-envelope"
                 solo
                 required
               ></v-text-field>
               <v-text-field
                 v-model="formInput.password"
+                :rules="[rules.required]"
+                prepend-inner-icon="bx bx-lock"
                 label="Password"
                 color="purple"
                 solo
@@ -22,21 +26,11 @@
               <v-spacer></v-spacer>
               <v-btn class="btnLogin" @click="login" color="yellow darken-3" style="color: white">Login</v-btn>
             </v-container>
-            <h5
-              style="
-                color: white;
-                text-align: center;
-                margin-bottom: 15px;
-                margin-top: 10px;
-              "
-            >
-              Don't have any account?
+            <h5 style=" color: white; text-align: center; margin-bottom: 15px; margin-top: 10px;">Don't have any account?
               <router-link
                 to="/register"
                 style="text-decoration: none; color: white"
-                class="linkRegister"
-                >Register here</router-link
-              >
+                class="linkRegister">Register here</router-link>
             </h5>
           </v-form>
       </div>
@@ -55,15 +49,30 @@ const route = "https://store.ksaduajy.com/laravel_esport/api/";
 export default {
   data() {
     return {
+      formHasErrors: false,
       formInput: {
         email: null,
         password: null,
+      },
+      rules: {
+        required: value => !!value || 'Required!',
+        email: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Invalid E-mail!'
+        },
       },
     };
   },
   methods:{
     login() {
-      
+      if (this.$refs.form.validate()) {
+        this.formHasErrors = false;
+        this.loginProcess();
+      } else {
+        this.formHasErrors = true;
+      }
+    },
+    loginProcess() {
       axios.post(route + 'login', this.formInput)
       .then(response => {
         console.log(response);
@@ -72,37 +81,19 @@ export default {
         deleteCookies.deleteAllCookies();  
         deleteCookies.setCookies("token", response.data.access_token, 30);
         console.log(response.data.access_token);
-       
-        this.$router.push({ name: 'Dashboard' });
-        //toast
+        
         toastr.success('Login Success');
+        this.$router.push({ name: 'Dashboard' });
+         
         this.switchPage(response.data.user.role && response.data.user.role.id);                
       }).catch(error => {
         console.log(error);
-        toastr.error('Login Failed');
+        if(error.response.status == 401)
+          toastr.error('Email or Password is Wrong!');
+        else
+          toastr.error('Login Failed!');
       });
     },
-    // switchPage(role){
-
-    //   role = parseInt(role);
-
-    //   switch(role){
-    //     case 1:
-    //       this.$router.push({ name: 'Admin.Home' });
-    //       break;
-
-    //     case 3:
-    //       this.$router.push({ name: 'User' });
-    //       break;
-
-    //     case 2:
-    //       this.$router.push({ path: '/Kurir' });
-    //       break;
-    //     default:
-    //       this.$router.push({ name: 'Login' });
-    //       break;
-    //   }
-    // },
   },
 };
 </script>

@@ -47,20 +47,29 @@
                     <v-card-text class="pb-0">
                         <v-container> 
                             <v-form ref="form">
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user" v-model="this.name" label="Name" type="text" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user-pin" v-model="this.nickname" label="Nickname" type="text" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-phone"  v-model="this.no_hp" label="No HP" type="numeric" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-envelope" v-model="this.email" label="Email" type="text" required></v-text-field>
-                                <v-select v-model="this.divisi" :items="[ 
-                                    { text: 'Mobile Legend', value: 0 }, 
-                                    { text: 'Pubg Mobile', value: 1 }, 
-                                    { text: 'Dota 2', value: 2 }, 
-                                    { text: 'Valorant', value: 3 }, 
-                                  ]" label="Divisi" prepend-icon="bx bx-selection">
-                                </v-select>
-                                <v-file-input prepend-icon="bx bx-upload" class="textfield mt-3" v-model="this.photo" accept=".jpeg" label="Upload Foto" required></v-file-input>
-                                <!-- <v-input class="textfield mt-3" prepend-icon="bx bx-upload" v-model="photo" label="Upload Foto" type="file" required> -->
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-lock" v-model="this.password" label="Password" type="password" required></v-text-field>
+                              <v-text-field v-model="formInput.name" prepend-icon="bx bx-user" :rules="[rules.required]" label="Nama Lengkap" color="purple" solo required></v-text-field>
+                              <v-text-field v-model="formInput.nickname" prepend-icon="bx bx-user-pin" :rules="[rules.required]" label="Nickname" color="purple" solo required></v-text-field>
+                              <v-text-field v-model="formInput.nohp" prepend-icon="bx bx-phone" :rules="[rules.required, rules.nohp]" label="No Handphone" color="purple" type="tel" solo required></v-text-field>
+                              <v-text-field v-model="formInput.email" prepend-icon="bx bx-envelope" label="Email" color="purple" :rules="[rules.required, rules.email]" solo required></v-text-field>
+                              <v-text-field v-model="formInput.password" prepend-icon="bx bx-lock" type="password" label="Password" color="purple" :rules="[rules.required, rules.password]" solo required></v-text-field>
+                              <v-autocomplete v-model="formInput.divisi" 
+                                      :items="divisis" item-text="nama"
+                                      item-value="kode_divisi"
+                                      return-object
+                                      label="Divisi" 
+                                      color="purple"
+                                      prepend-icon="bx bx-selection"
+                                      :rules="[rules.required]" 
+                                      solo required>
+                              </v-autocomplete>
+                              <v-file-input v-model="formInput.pasphoto" prepend-icon="bx bx-upload" :rules="[rules.required]" accept="image/*" color="grey" counter label="Masukkan Foto Profil" placeholder="Masukkan Foto Profil" solo :show-size="1000">
+                                  <template v-slot:selection="{ index, text }">
+                                      <v-chip v-if="index < 2" color="grey lighten-3" label>
+                                          {{ text }}
+                                      </v-chip>
+                                      <span v-else-if="index === 2" class="text-overline grey--text text--darken-3 mx-2"> +{{ pasphoto.length - 2 }} File(s)</span>
+                                  </template>
+                              </v-file-input>              
                             </v-form>
                         </v-container> 
                     </v-card-text>
@@ -77,6 +86,12 @@
 
 <script>
 import VueSidebarMenu from "../MenuSidebar";
+import axios from "axios";
+import { ref, onMounted } from 'vue';
+// import { useToastr } from '../../toastr';
+
+// const toastr = useToastr();
+const route = "https://store.ksaduajy.com/laravel_esport/api/";
 
 export default {
   components: {VueSidebarMenu},
@@ -92,6 +107,48 @@ export default {
       divisi: 0,
       photo: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
       password: "anjaymabar",
+
+      formHasErrors: false,
+      formInput: {
+        name: null,
+        nickname: null,
+        nohp: null,
+        email : null,
+        password : null,
+        divisi: null,
+        pasphoto : null,
+      }, 
+      rules: {
+        required: value => !!value || 'Required!',
+        email: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Invalid Email!'
+        },
+        password: value => {
+          const pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+          return pattern.test(value) || 'Minimum Eight Characters, At Least One Letter, One Number And One Special Character!'
+        },
+        nohp: value => {
+          const pattern = /^08[0-9]{10,11}$/
+          return pattern.test(value) || 'Invalid No Handphone (12-13 Digits)!'
+        },
+      },
+    }
+  },
+  setup() {
+    const divisis = ref([])
+
+    onMounted(() => {
+        axios.get(route + 'divisis')
+        .then(response => {
+          divisis.value = response.data.data;
+        }).catch(error => {
+          console.log(error);            
+        })
+    })
+
+    return {
+        divisis,
     }
   },
   methods: {
