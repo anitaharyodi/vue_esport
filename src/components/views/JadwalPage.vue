@@ -59,7 +59,7 @@
   
   const route = "https://store.ksaduajy.com/laravel_esport/api/";
 
-  export default {
+export default {
     components: {VueSidebarMenu},
     setup() {
       // const jadwals
