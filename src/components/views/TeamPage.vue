@@ -16,7 +16,7 @@
                     <template v-slot:[`item.actions`]="{ item }">
                       <!-- <span v-if="role == user"> -->
                         <v-icon color="green" class="mr-2" @click="editData(item)">bx bx-edit</v-icon>
-                      <v-icon color="red" class="mr-2" @click="deleteData(item.kode_tim)">bx bxs-trash</v-icon>
+                      <v-icon color="red" class="mr-2" @click="deleteData(item.id)">bx bxs-trash</v-icon>
                     </template>
                 </v-data-table>
             </v-row>
@@ -29,8 +29,8 @@
                 </v-card-title> 
                 <v-card-text class="pb-0">
                   <v-container> 
-                    <v-text-field class="textfield mt-3" prepend-icon="bx bx-group" v-model="newTim.nama" label="Nama Tim" type="text" required></v-text-field>
-                    <v-text-field class="textfield mt-3" prepend-icon="bx bx-notepad" v-model="newTim.deskripsi" label="Deskripsi" type="text" required></v-text-field>
+                    <v-text-field class="textfield mt-3" prepend-icon="bx bx-group" v-model="newTim.nama_tim" label="Nama Tim" type="text" required></v-text-field>
+                    <v-text-field class="textfield mt-3" prepend-icon="bx bx-notepad" v-model="newTim.deskripsi_tim" label="Deskripsi" type="text" required></v-text-field>
                   </v-container> 
                 </v-card-text>
                 <v-divider></v-divider>
@@ -64,8 +64,8 @@ const toastr = useToastr();
         const tims = ref([])
 
         const newTim = reactive({
-            nama: '',
-            deskripsi: '',
+            nama_tim: '',
+            deskripsi_tim: '',
             // lambang: '',
         })
 
@@ -85,37 +85,35 @@ const toastr = useToastr();
         function save() {
           // create member
           axios.post(route + 'tims', {
-            nama: newTim.nama,
-            deskripsi: newTim.deskripsi,
+            nama_tim: newTim.nama_tim,
+            deskripsi_tim: newTim.deskripsi_tim,
             // lambang: newTim.lambang,
           }, 
           {
             headers: {
                 'Authorization': 'Bearer ' + deleteCookies.getCookies("token"),
-                'Content-Type': 'multipart/form-data'
               }
           })
           .then(() => {
-            dialog.value = false
+              dialog.value = false
               getData();
-            this.resetForm();
-            }).catch(error => {
-              console.log(error);            
-            })
-              toastr.success('Berhasil Tambah Tim!');
+              this.resetForm();
+          }).catch(error => {
+            console.log(error);            
+          })
+            toastr.success('Berhasil Tambah Tim!');
           // (link, body, headers)
         }
 
         function update() {
           axios.put(route + 'tims/' + this.editId, {
-            nama_tim: newTim.nama,
-            deskripsi_tim: newTim.deskripsi,
+            nama_tim: newTim.nama_tim,
+            deskripsi_tim: newTim.deskripsi_tim,
             // lambang: newTim.lambang,
           }, 
           {
             headers: {
                 'Authorization': 'Bearer ' + deleteCookies.getCookies("token"),
-                'Content-Type': 'multipart/form-data'
               }
           })
           .then(() => {
@@ -155,8 +153,8 @@ const toastr = useToastr();
             dialog,
             editedIndex: 'Tambah',
             headers: [
-                {text: "Nama", value: "nama"},
-                {text: "Deskripsi", value: "deskripsi"},
+                {text: "Nama", value: "nama_tim"},
+                {text: "Deskripsi", value: "deskripsi_tim"},
                 // {text: "Lambang", value: "lambang"},
                 {text: "", value: "actions"},
             ],
@@ -181,17 +179,17 @@ const toastr = useToastr();
         }
       },
       resetForm() {
-        this.newTim.nama = null;
-        this.newTim.deskripsi = null;
-        this.newTim.lambang = null;
+        this.newTim.nama_tim = null;
+        this.newTim.deskripsi_tim = null;
+        // this.newTim.lambang = null;
       },
       editData(item) {
         this.editedIndex = 'Edit';
         this.dialog = true;
-        this.editId = item.kode_tim;
+        this.editId = item.id;
 
-        this.newTim.nama = item.nama;
-        this.newTim.deskripsi = item.deskripsi;
+        this.newTim.nama_tim = item.nama_tim;
+        this.newTim.deskripsi_tim = item.deskripsi_tim;
         // this.newTim.lambang = item.lambang;
         // this.no_hp = item.no_hp;
         // this.email = item.email;
