@@ -17,7 +17,7 @@
               </v-col>
               <v-col cols="12" sm="6" md="4">
                 <div class="text-center">
-                  <img :src="'https://store.ksaduajy.com/laravel_esport/laravel_esport/public/foto/' + user.pasphoto" 
+                  <img :src="'https://store.ksaduajy.com/laravel_esport/foto/' + user.pasphoto" 
                     style="
                       margin-top: 60px;
                       border-radius: 20px;
@@ -25,7 +25,7 @@
                       max-height: 256px;
                       min-width: 256px;
                       min-height: 256px;
-                      object-fit: cover;"
+                      object-fit: cover"
                   />
                 </div>
               </v-col>
@@ -47,7 +47,7 @@
                               <v-text-field v-model="user.nohp" prepend-icon="bx bx-phone" :rules="[rules.required, rules.nohp]" label="No Handphone" color="purple" type="tel" solo required></v-text-field>
                               <v-text-field v-model="user.email" prepend-icon="bx bx-envelope" label="Email" color="purple" :rules="[rules.required, rules.email]" solo required></v-text-field>
                               <v-text-field v-model="user.password" prepend-icon="bx bx-lock" type="password" label="Password" color="purple" :rules="[rules.required, rules.password]" solo required></v-text-field>
-                              <v-autocomplete v-model="user.divisi" 
+                              <v-select v-model="user.divisi"
                                       :items="divisis" item-text="nama"
                                       item-value="kode_divisi"
                                       return-object
@@ -56,7 +56,7 @@
                                       prepend-icon="bx bx-selection"
                                       :rules="[rules.required]" 
                                       solo required>
-                              </v-autocomplete>
+                              </v-select>
                               <v-file-input v-model="user.pasphoto" prepend-icon="bx bx-upload" :rules="[rules.required]" accept="image/*" color="grey" counter label="Masukkan Foto Profil" placeholder="Masukkan Foto Profil" solo :show-size="1000">
                                   <template v-slot:selection="{ index, text }">
                                       <v-chip v-if="index < 2" color="grey lighten-3" label>
@@ -71,7 +71,7 @@
                     <v-divider></v-divider>
                     <v-card-actions class="justify-end">
                         <v-btn color="#EEEEEE" large style="font-family: Poppins; font-size: 20px; text-transform: capitalize; font-weight: 900; color:#001D38;" @click="closeDialog()"> Cancel </v-btn>
-                        <v-btn color="#93A9D1" large style="font-family: Poppins; font-size: 20px; text-transform: capitalize; font-weight: 700; color:white;" @click="saveData()"> Save </v-btn> 
+                        <v-btn color="#93A9D1" large style="font-family: Poppins; font-size: 20px; text-transform: capitalize; font-weight: 700; color:white;" @click="update"> Save </v-btn> 
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -82,11 +82,11 @@
 <script>
 import VueSidebarMenu from "../MenuSidebar";
 import axios from "axios";
-import { ref, onMounted } from 'vue';
-import { reactive } from 'vue';
-// import { useToastr } from '../../toastr';
+import { onMounted, ref, reactive } from "vue";
+import * as deleteCookies from "@/deleteCookies";
+import { useToastr } from '@/../toastr';
 
-// const toastr = useToastr();
+const toastr = useToastr();
 const route = "https://store.ksaduajy.com/laravel_esport/api/";
 
 export default {
@@ -105,7 +105,7 @@ export default {
           return pattern.test(value) || 'Invalid Email!'
         },
         password: value => {
-          const pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+          const pattern = /^(?=.[A-Za-z])(?=.\d)(?=.[@$!%#?&])[A-Za-z\d@$!%*#?&]{8,}$/
           return pattern.test(value) || 'Minimum Eight Characters, At Least One Letter, One Number And One Special Character!'
         },
         nohp: value => {
@@ -128,24 +128,18 @@ export default {
     });
 
     function dataUser(){
-      let id = localStorage.getItem('id')
-      let token =  localStorage.getItem('token')
-
-      console.log("id :" + id)
-      console.log("token :" + token)
-
-      axios.get(route + `user/${id}` ,{
-        headers:{
-          'Authorization' : `Bearer ${token}`
-        }
+      axios.get(route + 'user/' +localStorage.getItem('id'),{
+        headers: {
+            'Authorization': 'Bearer '+ localStorage.getItem('token')
+          }
       },).then((response) => {
-          user.name = response.data.data.name
-          user.nickname = response.data.data.nickname
-          user.nohp = response.data.data.nohp
-          user.email = response.data.data.email
-          user.password = response.data.data.password
-          user.divisi = response.data.data.divisi.kode_divisi
-          user.pasphoto = response.data.data.pasphoto
+          user.name = response.data.data[0].name
+          user.nickname = response.data.data[0].nickname
+          user.nohp = response.data.data[0].nohp
+          user.email = response.data.data[0].email
+          user.password = response.data.data[0].password
+          user.divisi = response.data.data[0].nama
+          user.pasphoto = response.data.data[0].pasphoto
           
           console.log(response)
         })
@@ -153,6 +147,28 @@ export default {
           console.log(error)
         })
     }
+
+    function update() {
+        axios.put(route + 'user/' + 8, {
+          name: user.name,
+          nickname: user.nickname,
+          nohp: user.nohp,
+          email: user.email,
+          password: user.password,
+          divisi: user.divisi.kode_divisi,
+        }, {
+          headers: {
+              'Authorization': 'Bearer ' + deleteCookies.getCookies("token")
+            }
+        })
+        .then(() => {
+          toastr.success('Berhasil Edit Profil!');
+          dataUser();
+          }).catch(error => {
+            toastr.error('Gagal Edit Profil!');
+            console.log(error);            
+          })
+      }
 
     const divisis = ref([])
 
@@ -171,6 +187,7 @@ export default {
     return {
       user,
       divisis,
+      update,
     }
   },
   methods: {

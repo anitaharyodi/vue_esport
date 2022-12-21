@@ -39,8 +39,8 @@
 
 <script>
 import axios from "axios";
-import * as deleteCookies from "../deleteCookies";
 import { useToastr } from '../../toastr';
+import * as deleteCookies from "@/deleteCookies";
 
 const toastr = useToastr();
 
@@ -73,19 +73,20 @@ export default {
       }
     },
     loginProcess() {
-      axios.post(route + 'login', this.formInput)
+      axios.post(route + 'login', this.formInput, {
+          headers: {
+            'Authorization': 'Bearer ' + deleteCookies.getCookies("token")
+          }
+        })
       .then(response => {
         console.log(response);
 
-        //delete token
-        deleteCookies.deleteAllCookies();  
-        deleteCookies.setCookies("token", response.data.access_token, 30);
-        console.log(response.data.access_token);
-        
+        localStorage.setItem("id", response.data.user.id);
+        localStorage.setItem("token", response.data.access_token);
+        this.error_message = response.data.message;
+
         toastr.success('Login Success');
-        this.$router.push({ name: 'Dashboard' });
-         
-        this.switchPage(response.data.user.role && response.data.user.role.id);                
+        this.$router.push({ name: 'Dashboard' });          
       }).catch(error => {
         console.log(error);
         if(error.response.status == 401)
