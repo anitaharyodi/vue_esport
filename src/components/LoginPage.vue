@@ -2,7 +2,7 @@
   <div id="background">
       <div class="loginCard">
         <h1 class="titleText">LOGIN</h1>
-          <v-form ref="form" v-model="valid" >
+          <v-form ref="form" @submit.prevent="login" v-model="valid" >
             <v-container class="formLogin">
               <v-text-field
                 v-model="formInput.email"
@@ -39,8 +39,10 @@
 
 <script>
 import axios from "axios";
-import * as deleteCookies from "../deleteCookies";
+// import * as deleteCookies from "../deleteCookies";
 import { useToastr } from '../../toastr';
+import { reactive } from 'vue';
+import router from '../router';
 
 const toastr = useToastr();
 
@@ -50,10 +52,6 @@ export default {
   data() {
     return {
       formHasErrors: false,
-      formInput: {
-        email: null,
-        password: null,
-      },
       rules: {
         required: value => !!value || 'Required!',
         email: value => {
@@ -63,29 +61,37 @@ export default {
       },
     };
   },
-  methods:{
-    login() {
-      if (this.$refs.form.validate()) {
-        this.formHasErrors = false;
-        this.loginProcess();
-      } else {
-        this.formHasErrors = true;
-      }
-    },
-    loginProcess() {
-      axios.post(route + 'login', this.formInput)
-      .then(response => {
-        console.log(response);
+  setup() {
+    const formInput = reactive({ 
+        email: '',
+        password: '',
+    });
 
-        //delete token
-        deleteCookies.deleteAllCookies();  
-        deleteCookies.setCookies("token", response.data.access_token, 30);
-        console.log(response.data.access_token);
-        
-        toastr.success('Login Success');
-        this.$router.push({ name: 'Dashboard' });
-         
-        this.switchPage(response.data.user.role && response.data.user.role.id);                
+    function login() {
+      let email = formInput.email;
+      let password = formInput.password;
+
+      console.log("Data", email, password);
+      axios.post(route + 'login', {
+        email: email,
+        password: password
+      })
+      .then (response => {
+          if(response.data.user.email_verified_at == null) {
+            toastr.error('Please Verify Your Email First!');
+          }else{
+            toastr.success('Login Success!');
+
+            localStorage.setItem( 'token', response.data.access_token);
+            localStorage.setItem( 'id', response.data.user.id);
+            console.log(localStorage.getItem('token'));
+            console.log(localStorage.getItem('id'));
+
+            if(response.data.user.role == 'admin')
+              router.push({ name: 'Register' });
+            else
+              router.push({ name: 'Dashboard' });
+          }
       }).catch(error => {
         console.log(error);
         if(error.response.status == 401)
@@ -93,7 +99,53 @@ export default {
         else
           toastr.error('Login Failed!');
       });
-    },
+    }
+    return {
+      formInput,
+      login,
+    };
+  },
+  methods:{
+    // login() {
+    //   if (this.$refs.form.validate()) {
+    //     this.formHasErrors = false;
+    //     this.loginProcess();
+    //   } else {
+    //     this.formHasErrors = true;
+    //   }
+    // },
+    // loginProcess() {
+    //   axios.post(route + 'login', this.formInput)
+    //   .then(response => {
+    //     console.log(response);
+
+    //     //delete token
+    //     deleteCookies.deleteAllCookies();  
+    //     deleteCookies.setCookies("token", response.data.access_token, 30);
+    //     console.log(response.data.access_token);
+        
+    //     toastr.success('Login Success');
+    //     // this.$router.push({ name: 'Dashboard' });
+    //     // if(response.data.user.role == 'admin')
+    //     //   this.$router.push({ name: 'Register' + window.btoa(response.data.user.role.id) });
+    //     // else
+    //     //   this.$router.push({ name: 'Login' + window.btoa(role) });
+
+    //     this.switchPage(response.data.user.role.id);                
+    //   }).catch(error => {
+    //     console.log(error);
+    //     if(error.response.status == 401)
+    //       toastr.error('Email or Password is Wrong!');
+    //     else
+    //       toastr.error('Login Failed!');
+    //   });
+    // },
+    // switchPage(role) {
+    //   if(role == 'admin')
+    //     this.$router.push({ name: 'Register' });
+    //   else
+    //     this.$router.push({ name: 'Dashboard' });
+    // },
   },
 };
 </script>

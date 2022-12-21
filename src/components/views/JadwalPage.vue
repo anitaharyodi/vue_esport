@@ -67,13 +67,14 @@
 </template>
 
 <script>
-  import VueSidebarMenu from "../MenuSidebar";
-//   import { withValidation } from 'vee-validate';
+import VueSidebarMenu from "../MenuSidebar";
+import axios from "axios";
+import { ref, onMounted } from 'vue';
+//import router from "../router";
 
-//     const VTextFieldWithValidation = withValidation(VTextField);
+const route = "https://store.ksaduajy.com/laravel_esport/api/";
 
-
-  export default {
+export default {
     components: {VueSidebarMenu},
     data() {
       return {
@@ -109,6 +110,25 @@
         ],
 
       }
-    }
+    },
+    setup() {
+        const jadwal = ref([])
+
+        onMounted(() => {
+            axios.get(route + 'jadwal' ,{
+                headers:{
+                    'Authorization' : `Bearer ${token}`
+                }
+        },).then(response => {
+                jadwal.value = response.data.data;
+        }).catch(error => {
+            console.log(error);            
+            })
+        })
+
+        return {
+            jadwal,
+        }
+    },
   }
 </script>
