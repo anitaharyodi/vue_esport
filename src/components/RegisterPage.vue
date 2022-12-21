@@ -129,9 +129,9 @@ export default {
                 // this.switchPage(response.data.user.idRole);                
             }).catch(error => {
                 console.log(error);  
-                if(error.response.status == 422) {
+                if(error.response.status == 400) {
                     toastr.error('Email Already Exist!');
-                } else if(error.response.status == 500) {
+                } else if(error.response.status == 402) {
                     toastr.error('Server Error!');
                 } else {
                     toastr.error('Register Failed!');
