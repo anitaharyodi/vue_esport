@@ -14,20 +14,20 @@
             
             <v-row>
                 <v-data-table :headers="headers" :items="members" :search="search" :key="id">
-                    <template v-slot:[`item.division`]="{ item }">
+                    <!-- <template v-slot:[`item.division`]="{ item }">
                         <span v-if="item.nama == 0">Mobile Legend</span>
                         <span v-else-if="item.nama == 1">Pubg Mobile</span>
                         <span v-else-if="item.nama == 2">Dota 2</span>
                         <span v-else-if="item.nama == 3">Valorant</span>
-                    </template>
-                    <template v-slot:[`item.photo`]="{ item }">
+                    </template> -->
+                    <!-- <template v-slot:[`item.photo`]="{ item }">
                         <v-img
                             :src="item.photo"
                             max-width="100"
                             max-height="100"
                             contain
                         ></v-img>
-                    </template>
+                    </template> -->
                     <!-- actions -->
                     <template v-slot:[`item.actions`]="{ item }">
                       <!-- <span v-if="role == user"> -->
@@ -38,7 +38,7 @@
                         <!-- <v-icon  color="red" class="mr-2"  @click="selectedId = item.id; dialogConfirm = true">mdi-delete</v-icon>
                         <v-icon  color="green" class="mr-2" @click="editData()">mdi-information-outline</v-icon> -->
                       <!-- </span> -->
-                      <v-icon color="red" class="mr-2" @click="dialogDelete = true">bx bxs-trash</v-icon>
+                      <v-icon color="red" class="mr-2" @click="deleteData(item.id_member)">bx bxs-trash</v-icon>
                     </template>
                 </v-data-table>
             </v-row>
@@ -46,39 +46,39 @@
                 <v-card style="border-radius: 10px;">
                     <v-card-title class="pa-0">
                         <v-toolbar color="purple darken-4" elevation="0" style="border-radius: 10px 10px 0px 0px;" height="90%">
-                          <span style="color: white; font-family: Poppins; font-weight: 800; font-size: 160%; margin-left: 3%;">{{ formTitle }}</span>   
+                          <span style="color: white; font-family: Poppins; font-weight: 800; font-size: 160%; margin-left: 3%;">{{ formTitle }} Member</span>   
                         </v-toolbar>
                     </v-card-title> 
                     <v-card-text class="pb-0">
                         <v-container> 
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user" v-model="newMember.name" label="Name" type="text" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user-pin" v-model="newMember.nickname" label="Nickname" type="text" required></v-text-field>
-                                <v-select v-model="newMember.nama" :items="[ 
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user" v-model="newMember.nama_member" label="Name" type="text" required></v-text-field>
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user-pin" v-model="newMember.nickname_member" label="Nickname" type="text" required></v-text-field>
+                                <!-- <v-select v-model="newMember.nama_divisi" :items="[ 
                                     { text: 'Mobile Legend', value: 0 }, 
                                     { text: 'Pubg Mobile', value: 1 }, 
                                     { text: 'Dota 2', value: 2 }, 
                                     { text: 'Valorant', value: 3 }, 
                                   ]" label="Divisi" prepend-icon="bx bx-selection">
-                                </v-select>
+                                </v-select> -->
                         </v-container> 
                     </v-card-text>
                     <v-divider></v-divider>
                     <v-card-actions class="justify-end">
                         <v-btn color="#EEEEEE" large style="font-family: Poppins; font-size: 20px; text-transform: capitalize; font-weight: 900; color:gray;" @click="closeDialog()">Cancel</v-btn>
-                        <v-btn color="#EEEEEE" large style="font-family: Poppins; font-size: 20px; text-transform: capitalize; font-weight: 900; color:purple;" @click="save()">Save</v-btn>
+                        <v-btn color="#EEEEEE" large style="font-family: Poppins; font-size: 20px; text-transform: capitalize; font-weight: 900; color:purple;" @click="setForm">Save</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
+            <!-- <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
                 <v-card-title class="text-h5"><strong>Are you sure to delete?</strong></v-card-title>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                        <v-btn color="green darken-1" text @click="deleteData(newMember.id)">Yes</v-btn>
+                        <v-btn color="green darken-1" text @click="deleteData(item.id_member)">Yes</v-btn>
                         <v-btn color="red darken-1" text @click="closeDelete">No</v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog>
+        </v-dialog> -->
           </section>
   </div>
 </template>
@@ -89,6 +89,7 @@
   import { onMounted, ref, reactive } from "vue";
   import * as deleteCookies from "@/deleteCookies";
   import { useToastr } from '@/../toastr';
+  // import { useRoute } from 'vue2-helpers/vue-router'
 
   const toastr = useToastr();
   
@@ -100,13 +101,13 @@
       // const members
       const members = ref([])
 
-      const dialogDelete = ref(false)
+      // const dialogDelete = ref(false)
       const dialog = ref(false)
 
       const newMember = reactive({
-        name: '',
-        nickname: '',
-        nama: ''
+        nama_member: '',
+        nickname_member: '',
+        nama_divisi: ''
       })
 
       function getData() {
@@ -129,9 +130,9 @@
       function save() {
         // create member
         axios.post(route + 'members', {
-          name: newMember.name,
-          nickname: newMember.nickname,
-          nama: newMember.nama
+          nama_member: newMember.nama_member,
+          nickname_member: newMember.nickname_member,
+          // nama_divisi: newMember.nama_divisi
         }, {
           headers: {
               'Authorization': 'Bearer ' + deleteCookies.getCookies("token")
@@ -141,10 +142,32 @@
           toastr.success('Berhasil tambah member!');
           dialog.value = false
           getData();
+          this.resetForm();
           }).catch(error => {
             console.log(error);            
           })
         // (link, body, headers)
+      }
+
+      function update() {
+        axios.put(route + 'members/' + this.editId, {
+          nama_member: newMember.nama_member,
+          nickname_member: newMember.nickname_member,
+          // nama_divisi: newMember.nama_divisi
+        }, {
+          headers: {
+              'Authorization': 'Bearer ' + deleteCookies.getCookies("token")
+            }
+        })
+        .then(() => {
+          toastr.success('Berhasil edit member!');
+          dialog.value = false
+          this.editedIndex = 'Tambah';
+          this.resetForm();
+          getData();
+          }).catch(error => {
+            console.log(error);            
+          })
       }
 
       function deleteData(id) {
@@ -154,8 +177,10 @@
           }
         }).then(() => {
           toastr.success('Berhasil delete member!');
-          dialogDelete.value = false
+          // dialogDelete.value = false
           getData();
+          this.editedIndex = "Tambah";
+          this.resetForm();
           }).catch(error => {
             console.log(error.response.data);            
           })
@@ -166,41 +191,59 @@
       return {
         newMember,
         dialog,
-        editedIndex: -1,
+        editedIndex: 'Tambah',
         headers: [
-          {text: "Nama", value: "name"},
-          {text: "Nickname", value: "nickname"},
-          {text: "Divisi", value: "nama"},
+          {text: "Nama", value: "nama_member"},
+          {text: "Nickname", value: "nickname_member"},
+          {text: "Divisi", value: "nama_divisi"},
           {text: "", value: "actions"},
         ],
         formTodo: {
-          name: null,
-          nickname: null,
-          nama: null,
+          nama_member: null,
+          nickname_member: null,
+          nama_divisi: null,
         },
         members,
-        dialogDelete,
+        // dialogDelete,
         save,
-        deleteData
+        deleteData,
+        update,
+        editId: ''
       }
     },
     computed: {
         formTitle () {
-            return this.editedIndex === -1 ? 'Tambah Member' : 'Edit Member'
+            return this.editedIndex
         },
     },
     methods: {
+    setForm(){
+      if(this.editedIndex !== 'Tambah'){
+        this.update();
+      }
+      else{
+        this.save();
+      }
+    },
+    resetForm() {
+      this.newMember.nama_member = null;
+      this.newMember.nickname_member = null;
+    },
       //make method for show data
       editData(item) {
+        this.editedIndex = 'Edit';
         this.dialog = true;
-        this.name = item.name;
-        this.nickname = item.nickname;
-        this.no_hp = item.no_hp;
-        this.email = item.email;
+        this.editId = item.id_member;
+        this.newMember.nama_member = item.nama_member;
+        this.newMember.nickname_member = item.nickname_member;
+        // this.no_hp = item.no_hp;
+        // this.email = item.email;
         // this.divisi = item.divisi;
       },
       closeDialog() {
         this.dialog = false;
+        this.resetForm();
+        this.editedIndex = 'Tambah';
       },
       deleteItem (item) {
           this.formTodo = Object.assign({}, item)

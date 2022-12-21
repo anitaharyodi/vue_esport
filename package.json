@@ -22,6 +22,7 @@
     "vue-carousel": "^0.18.0",
     "vue-router": "^3.6.5",
     "vue-toastification": "^1.7.14",
+    "vue2-helpers": "^2.1.1",
     "vuetify": "^2.6.12"
   },
   "devDependencies": {
