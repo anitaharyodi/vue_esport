@@ -9,9 +9,7 @@
             <div style="display: flex; justify-content: end;">
               <v-btn color="purple darken-4" dark @click="dialog = true"> Tambah </v-btn>
             </div>
-              
             <hr>
-            
             <v-row>
                 <v-data-table :headers="headers" :items="members" :search="search" :key="id">
                     <!-- <template v-slot:[`item.division`]="{ item }">

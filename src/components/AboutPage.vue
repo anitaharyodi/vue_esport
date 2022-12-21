@@ -15,10 +15,15 @@
                             <v-list-item>
                                 <v-list-item-content>
                                     <v-list-item-title class="text-h5 mb-1 d-flex justify-center" style="color: white; margin-top: 140px;">
-                                        "FOUR KINGS IS THE E-SPORTS FOR ALL GAMER."
+                                        "FOUR KINGS E-SPORTS."
                                     </v-list-item-title>
-                                    <v-list-item-subtitle class="wrap-text d-flex justify-center mt-5" style="color: white;">It is a long established fact that a reader will be distracted the readable content of page when looking at it layout</v-list-item-subtitle>
-                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">the point using lorem Ipsum is that it has a more-or-less normal distribution.</v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center mt-5" style="color: white;">The Four Kings website is a website in the field of E-sports which aims to be a place for </v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">game players to develop their game skills. On the Four Kings E-Sport website, the website</v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">only focuses on the 4 main games that will be included, namely MOBILE LEGENDS, PUBG,</v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">DOTA and VALORANT. In addition, the Four Kings website can only be accessed by team</v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">leaders from each division who have registered at the beginning. Team leaders can help</v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">members or other players in the same division to form their respective teams and also</v-list-item-subtitle>
+                                    <v-list-item-subtitle class="wrap-text d-flex justify-center" style="color: white;">choose training schedules and tournament schedules for their teams.</v-list-item-subtitle>
                                     
                                 </v-list-item-content>
 
