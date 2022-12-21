@@ -2,21 +2,21 @@
   <div>
     <VueSidebarMenu/>
         <section class="home-section">
-            <div class="text">
-                <h1>Latihan</h1> 
-            </div>
-            <v-spacer></v-spacer>
             <div style="display: flex; justify-content: end;">
-              <v-btn color="purple darken-4" dark @click="dialog = true"> Tambah </v-btn>
+              <v-btn color="purple darken-4" dark @click="dialog = true" style="margin-top: 40px;"> Tambah </v-btn>
+            </div>
+            <div class="text">
+                <h1>Jadwal</h1> 
             </div>
               
             <hr>
             
             <v-row>
-                <v-data-table :headers="headers" :items="jadwals" :search="search" :key="id">
+                <v-data-table :headers="headers" :items="jadwals" :search="search" :key="id_jadwal">
+
                     <template v-slot:[`item.actions`]="{ item }">
                         <v-icon color="green" class="mr-2" @click="editData(item)">bx bx-edit</v-icon>
-                      <v-icon color="red" class="mr-2" @click="deleteData(item.id)">bx bxs-trash</v-icon>
+                      <v-icon color="red" class="mr-2" @click="deleteData(item.id_jadwal)">bx bxs-trash</v-icon>
                     </template>
                 </v-data-table>
             </v-row>
@@ -29,18 +29,11 @@
                     </v-card-title> 
                     <v-card-text class="pb-0">
                         <v-container> 
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user" v-model="newDivisi.judul" label="Judul" type="text" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user-pin" v-model="newDivisi.tgl_mulai" label="Tanggal mulai" type="date" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user-pin" v-model="newDivisi.tgl_selesai" label="Tanggal selesai" type="date" required></v-text-field>
-                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-user-pin" v-model="newDivisi.tempat" label="Tempat" type="text" required></v-text-field>
-                                <v-file-input v-model="newDivisi.poster" accept="image/*" color="grey" counter label="Masukkan Poster" placeholder="Masukkan Poster" solo :show-size="1000">
-                                    <template v-slot:selection="{ index, text }">
-                                        <v-chip v-if="index < 2" color="grey lighten-3" label>
-                                            {{ text }}
-                                        </v-chip>
-                                        <span v-else-if="index === 2" class="text-overline grey--text text--darken-3 mx-2"> +{{ poster.length - 2 }} File(s)</span>
-                                    </template>
-                                </v-file-input>
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bxl-typescript" v-model="newJadwal.judul_jadwal" label="Judul" type="text" required></v-text-field>
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-calendar" v-model="newJadwal.mulai" label="Tanggal mulai" type="date" required></v-text-field>
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-calendar" v-model="newJadwal.selesai" label="Tanggal selesai" type="date" required></v-text-field>
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bxs-map-pin" v-model="newJadwal.tempat_jadwal" label="Tempat" type="text" required></v-text-field>
+                                <v-text-field class="textfield mt-3" prepend-icon="bx bx-street-view" v-model="newJadwal.jenis" label="Jenis Kegiatan" type="text" required></v-text-field>
                         </v-container> 
                     </v-card-text>
                     <v-divider></v-divider>
@@ -75,15 +68,14 @@
       // const dialogDelete = ref(false)
       const dialog = ref(false)
 
-      const newDivisi = reactive({
-        judul: '',
-        tgl_mulai: '',
-        tgl_selesai: '',
-        tempat: '',
-        poster: '',
-        biaya: 0,
-        deskripsi: '',
-        jenis_kegiatan: 'Latihan'
+      const newJadwal = reactive({
+        judul_jadwal: '',
+        mulai: '',
+        selesai: '',
+        tempat_jadwal: '',
+        biaya_jadwal: '',
+        deskripsi_jadwal: '',
+        jenis: ''
       })
 
       function getData() {
@@ -106,18 +98,16 @@
       function save() {
         // create jadwals
         axios.post(route + 'jadwals', {
-          judul: newDivisi.judul,
-          tgl_mulai: newDivisi.tgl_mulai,
-          tgl_selesai: newDivisi.tgl_selesai,
-          tempat: newDivisi.tempat,
-          poster: newDivisi.poster,
-          biaya: newDivisi.biaya,
-          deskripsi: newDivisi.deskripsi,
-          jenis_kegiatan: newDivisi.jenis_kegiatan
+          judul_jadwal: newJadwal.judul_jadwal,
+          mulai: newJadwal.mulai,
+          selesai: newJadwal.selesai,
+          tempat_jadwal: newJadwal.tempat_jadwal,
+          biaya_jadwal: newJadwal.biaya_jadwal,
+          deskripsi_jadwal: newJadwal.deskripsi_jadwal,
+          jenis: newJadwal.jenis
         }, {
           headers: {
               'Authorization': 'Bearer ' + deleteCookies.getCookies("token"),
-              'Content-Type' : 'multipart/form-data'
             }
         })
         .then(() => {
@@ -133,18 +123,16 @@
 
       function update() {
         axios.put(route + 'jadwals/' + this.editId, {
-          judul: newDivisi.judul,
-          tgl_mulai: newDivisi.tgl_mulai,
-          tgl_selesai: newDivisi.tgl_selesai,
-          tempat: newDivisi.tempat,
-          poster: newDivisi.poster,
-          biaya: newDivisi.biaya,
-          deskripsi: newDivisi.deskripsi,
-          jenis_kegiatan: newDivisi.jenis_kegiatan
+          judul_jadwal: newJadwal.judul_jadwal,
+          mulai: newJadwal.mulai,
+          selesai: newJadwal.selesai,
+          tempat_jadwal: newJadwal.tempat_jadwal,
+          biaya_jadwal: newJadwal.biaya_jadwal,
+          deskripsi_jadwal: newJadwal.deskripsi_jadwal,
+          jenis: newJadwal.jenis
         }, {
           headers: {
               'Authorization': 'Bearer ' + deleteCookies.getCookies("token"),
-              'Content-Type' : 'multipart/form-data'
             }
         })
         .then(() => {
@@ -177,15 +165,15 @@
 
       // onmounted
       return {
-        newDivisi,
+        newJadwal,
         dialog,
         editedIndex: 'Tambah',
         headers: [
-          {text: "Judul", value: "judul"},
-          {text: "Tanggal Mulai", value: "tgl_mulai"},
-          {text: "Tanggal Selesai", value: "tgl_selesai"},
-          {text: "Tempat", value: "tempat"},
-          {text: "Poster", value: "poster"},
+          {text: "Judul", value: "judul_jadwal"},
+          {text: "Tanggal Mulai", value: "mulai"},
+          {text: "Tanggal Selesai", value: "selesai"},
+          {text: "Tempat", value: "tempat_jadwal"},
+          {text: "Jenis Kegiatan", value: "jenis"},
           {text: "", value: "actions"},
         ],
         jadwals,
@@ -211,25 +199,25 @@
       }
     },
     resetForm() {
-      this.newDivisi.judul = null;
-      this.newDivisi.tgl_mulai = null;
-      this.newDivisi.tgl_selesai = null;
-      this.newDivisi.tempat = null;
-      this.newDivisi.poster = null;
+      this.newJadwal.judul_jadwal = null;
+      this.newJadwal.mulai = null;
+      this.newJadwal.selesai = null;
+      this.newJadwal.tempat_jadwal = null;
+      this.newJadwal.biaya_jadwal = null;
+      this.newJadwal.jenis = null;
     },
       //make method for show data
       editData(item) {
         this.editedIndex = 'Edit';
         this.dialog = true;
-        this.editId = item.id;
-        this.newDivisi.judul = item.judul;
-        this.newDivisi.tgl_mulai = item.tgl_mulai;
-        this.newDivisi.tgl_selesai = item.tgl_selesai;
-        this.newDivisi.tempat = item.tempat;
-        this.newDivisi.poster = item.poster;
-        this.newDivisi.biaya = item.biaya;
-        this.newDivisi.deskripsi = item.deskripsi;
-        this.newDivisi.jenis_kegiatan = item.jenis_kegiatan;
+        this.editId = item.id_jadwal;
+        this.newJadwal.judul_jadwal = item.judul_jadwal;
+        this.newJadwal.mulai = item.mulai;
+        this.newJadwal.selesai = item.selesai;
+        this.newJadwal.tempat_jadwal = item.tempat_jadwal;
+        this.newJadwal.biaya_jadwal = item.biaya_jadwal;
+        this.newJadwal.deskripsi_jadwal = item.deskripsi_jadwal;
+        this.newJadwal.jenis = item.jenis;
       },
       closeDialog() {
         this.dialog = false;
